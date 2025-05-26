@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+
+
+# Virtual environments
+env/
+venv/
+myenv/
+.venv/
+
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# Database
+*.sqlite3
+*.db
+
+
+
+# dotenv / secrets
+.env
+.env.*
+
+# Django RQ (Redis queues)
+*.rq
+
+# Test and coverage
+htmlcov/
+.coverage
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+
