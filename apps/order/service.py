@@ -12,8 +12,9 @@ class OrderService:
         """
         serializer = OrderSerializer(data=validated_data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return serializer.data
+        order = serializer.save()
+        return (order, serializer.data)
+        
     
 
     @staticmethod

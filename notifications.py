@@ -2,14 +2,22 @@ import africastalking
 from django.conf import settings
 from django.core.mail import send_mail
 
+
+
 # Initialize Africa's Talking
 africastalking.initialize('sandbox', settings.AFRICASTALKING_API_KEY)
 sms = africastalking.SMS
 
-def send_order_sms(phone_number, customer_name, order_id):
+def send_order_sms(customer, order_id):
     """
     Send SMS notification to customer.
     """
+    customer_name = customer.first_name
+    phone_number = customer.customer_profile.phone_number
+
+    if not phone_number:
+        return
+
     message = f"Hi {customer_name}, your order #{order_id} has been received. Thank you for shopping with us!"
     try:
         response = sms.send(message, [phone_number])
@@ -18,7 +26,7 @@ def send_order_sms(phone_number, customer_name, order_id):
         print(f"SMS sending failed: {e}")
         return None
 
-def send_order_email_to_admin(order):
+def send_order_email_to_admin(order, customer):
     """
     Send email notification to admin with order details.
     """
@@ -26,11 +34,13 @@ def send_order_email_to_admin(order):
     message = (
         f"A new order has been placed.\n\n"
         f"Order ID: {order.id}\n"
-        f"Customer: {order.customer.user.email}\n"
+        f"Customer: {customer.email}\n"
         f"Products:\n"
     )
-    for item in order.products.all():
+    for item in order.product.all():
         message += f"- {item.name} (Price: {item.price})\n"
-    message += f"\nTotal: {order.total_price()} " 
+    message += f"\nTotal: {order.total_amount} " 
+
+    print(message, 22222222222222222222222222222222)
 
     send_mail(subject, message, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL])

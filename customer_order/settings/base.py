@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+AFRICASTALKING_API_KEY = os.getenv('AFRICA_TALKING_API_KEY')
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 GOOGLE_OAUTH_CALLBACK_URL = os.getenv("GOOGLE_OAUTH_CALLBACK_URL")
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    'django_rq',
 
 ]
 
@@ -172,3 +173,43 @@ REST_AUTH = {
 }
 
 LOGIN_REDIRECT_URL = '/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'MAX_ENTRIES': 5000,
+        }
+    }
+}
+
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'default',
+    }
+}
+
+import os
+
+# Default backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get("EMAIL_HOST", None)
+EMAIL_PORT = os.environ.get("EMAIL_PORT", '587')  # Recommended
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", None)
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", None)
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+
+ADMIN_USER_NAME = os.environ.get("ADMIN_USER_NAME", "Admin user")
+ADMIN_USER_EMAIL = os.environ.get("ADMIN_USER_EMAIL", None)
+
+MANAGERS=[]
+ADMINS=[]
+if all([ADMIN_USER_NAME, ADMIN_USER_EMAIL]):
+    ADMINS +=[
+        (f'{ADMIN_USER_NAME}', f'{ADMIN_USER_EMAIL}')
+    ]
+    MANAGERS=ADMINS

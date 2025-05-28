@@ -20,18 +20,16 @@ from apps.customer.views import LoginPage, GoogleLogin, GoogleLoginCallback
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("login/", LoginPage.as_view(), name="login"),
+    re_path(r'^django_rq/', include('django_rq.urls')),
+    
     path("api/v1/auth/", include("dj_rest_auth.urls")),
     re_path(r"^api/v1/auth/accounts/", include("allauth.urls")),
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/google/", GoogleLogin.as_view(), name="google_login"),
-    path(
-        "api/v1/auth/google/callback/",
-        GoogleLoginCallback.as_view(),
-        name="google_login_callback",
-    ),
+    path("api/v1/auth/google/callback/",GoogleLoginCallback.as_view(),name="google_login_callback",),
 
     path('api/v1/order/', include('apps.order.urls')),
     path('api/v1/product/', include('apps.product.urls')),
     path('api/v1/category/', include('apps.category.urls')),
+    path('api/v1/customer/', include('apps.customer.urls')),
 ]

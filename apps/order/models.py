@@ -18,4 +18,4 @@ class Order(BaseModel):
     
 
     def __str__(self):
-        return f"Order {self.id} - {self.customer_name}"
+        return f"Order {self.id} - "
