@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 # Initialize Africa's Talking
-africastalking.initialize(settings.AFRICASTALKING_USERNAME, settings.AFRICASTALKING_API_KEY)
+africastalking.initialize('sandbox', settings.AFRICASTALKING_API_KEY)
 sms = africastalking.SMS
 
 def send_order_sms(phone_number, customer_name, order_id):

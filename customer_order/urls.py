@@ -15,8 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include, re_path
+from apps.customer.views import LoginPage, GoogleLogin, GoogleLoginCallback
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("login/", LoginPage.as_view(), name="login"),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
+    re_path(r"^api/v1/auth/accounts/", include("allauth.urls")),
+    path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
+    path("api/v1/auth/google/", GoogleLogin.as_view(), name="google_login"),
+    path(
+        "api/v1/auth/google/callback/",
+        GoogleLoginCallback.as_view(),
+        name="google_login_callback",
+    ),
+
+    path('api/v1/order/', include('apps.order.urls')),
+    path('api/v1/product/', include('apps.product.urls')),
+    path('api/v1/category/', include('apps.category.urls')),
 ]
