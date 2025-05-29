@@ -6,10 +6,12 @@ import os
 
 load_dotenv()
 
-#
-africastalking.initialize('sandbox', "atsk_60e90945110323c59dd41687baa31f1eee80576b93a2b1889384590fc3c777ed02a47d8b")
+API_KEY = os.getenv('AFRICA_TALKING_API_KEY')
+if not API_KEY:
+    raise ValueError("AFRICA_TALKING_API_KEY is not set in the environment variables.")
 
-print(os.getenv("AFRICA_TALKING_API_KEY"), 11111111111111111111111111111111111111111111111)
+africastalking.initialize('sandbox', API_KEY)
+
 sms = africastalking.SMS
 
 def send_order_sms(customer, order_id):
