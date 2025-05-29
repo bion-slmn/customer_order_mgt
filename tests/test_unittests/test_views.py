@@ -142,14 +142,14 @@ class OrderViewTests(APITestCase):
         order.product.set([self.product])
         url = reverse("view_order", args=[str(order.id)])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, 403)
 
 
     def test_create_order_unauthenticated(self):
         self.client.logout()
         url = reverse("create_order")
         response = self.client.post(url, {})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, 403)
 
 
 class CustomerViewTests(APITestCase):

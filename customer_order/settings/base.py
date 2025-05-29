@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from dotenv import load_dotenv
+from exceptions.exceptional_handler import custom_exception_handler
 
 load_dotenv()
 
@@ -129,7 +130,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'exceptions.exception_handler.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'exceptions.exceptional_handler.custom_exception_handler',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
