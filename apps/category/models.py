@@ -1,6 +1,5 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
-from django.utils import timezone
 from customer_order.base_model import BaseModel
 
 

@@ -24,7 +24,7 @@ class CustomerView(APIView):
     def post(self, request):
         data = request.data
         customer = CustomerService.create_customer(data)
-        return Response(customer, status=201)  # fixed typo: 'Resposse' -> 'Response'
+        return Response(customer, status=201)  
 
 
 class GoogleLogin(SocialLoginView):

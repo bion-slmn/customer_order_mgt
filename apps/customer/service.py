@@ -8,15 +8,7 @@ class CustomerService:
     @staticmethod
     def create_customer(data):
         """
-        Creates a new Customer (with a new User).
-        Expected `data` format:
-        {
-            "user": {
-                "username": "john_doe",
-                "email": "john@example.com",
-                "password": "securepassword123"
-            }
-        }
+        Creates a new Customer 
         """
         serializer = CustomerSerializer(data=data)
         serializer.is_valid(raise_exception=True)

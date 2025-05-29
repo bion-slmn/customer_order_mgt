@@ -30,8 +30,7 @@ class OrderView(APIView):
         data['customer'] = customer.id
         order_instance, order_serialised = OrderService.create_order(data)
 
-        print(3333333333333, order_instance, 11111111111111111111111111111111111)
-        #django_rq.enqueue(send_order_email_to_admin, order_instance, customer)
+        django_rq.enqueue(send_order_email_to_admin, order_instance, customer)
         django_rq.enqueue(send_order_sms, customer, order_instance.id)
 
         return Response(order_serialised, status=status.HTTP_201_CREATED)

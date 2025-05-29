@@ -41,6 +41,5 @@ def send_order_email_to_admin(order, customer):
         message += f"- {item.name} (Price: {item.price})\n"
     message += f"\nTotal: {order.total_amount} " 
 
-    print(message, 22222222222222222222222222222222)
 
-    send_mail(subject, message, settings.EMAIL_HOST_USER, [settings.ADMIN_EMAIL])
+    send_mail(subject, message, settings.EMAIL_HOST_USER, [settings.ADMIN_USER_EMAIL])
