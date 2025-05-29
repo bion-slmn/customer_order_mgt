@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 #
-africastalking.initialize('sandbox', os.getenv("AFRICA_TALKING_API_KEY"))
+africastalking.initialize('sandbox', "atsk_60e90945110323c59dd41687baa31f1eee80576b93a2b1889384590fc3c777ed02a47d8b")
 
 print(os.getenv("AFRICA_TALKING_API_KEY"), 11111111111111111111111111111111111111111111111)
 sms = africastalking.SMS
