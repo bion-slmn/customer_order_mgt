@@ -17,7 +17,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: github_actions
-          AFRICASTALKING_API_KEY: ${{ secrets.AFRICASTALKING_API_KEY }}
+          AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
