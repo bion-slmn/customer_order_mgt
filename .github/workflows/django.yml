@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
     services:
       postgres:
         image: postgres:latest
@@ -17,7 +19,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: github_actions
-          AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
         ports:
           - 5432:5432
     strategy:
