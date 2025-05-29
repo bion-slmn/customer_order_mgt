@@ -1,11 +1,13 @@
 import africastalking
 from django.conf import settings
 from django.core.mail import send_mail
+from dotenv import load_dotenv
+import os 
 
-
+load_dotenv()
 
 # Initialize Africa's Talking
-africastalking.initialize('sandbox', settings.AFRICASTALKING_API_KEY)
+africastalking.initialize('sandbox', os.getenv("AFRICASTALKING_API_KEY"))
 sms = africastalking.SMS
 
 def send_order_sms(customer, order_id):
