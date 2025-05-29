@@ -6,8 +6,10 @@ import os
 
 load_dotenv()
 
-# Initialize Africa's Talking
+#
 africastalking.initialize('sandbox', os.getenv("AFRICA_TALKING_API_KEY"))
+
+print(os.getenv("AFRICA_TALKING_API_KEY"), 11111111111111111111111111111111111111111111111)
 sms = africastalking.SMS
 
 def send_order_sms(customer, order_id):
