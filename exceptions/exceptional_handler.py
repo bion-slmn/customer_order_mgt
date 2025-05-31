@@ -4,6 +4,8 @@ Custom exception handler for the application.
 
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 
 
@@ -18,8 +20,13 @@ def custom_exception_handler(exc, context):
         'IntegrityError': _handle_integrity_error,
     }
 
+    print(1111111111111111111111111111111111111111111111111111111111111111111111111111111)
+
     response = exception_handler(exc, context)
     exception_class = exc.__class__.__name__
+
+    if isinstance(exc, DjangoValidationError):
+        return _handle_validation_error(exc, context, None)
 
     if exception_class in handler:
         return handler[exception_class](exc, context, response)
