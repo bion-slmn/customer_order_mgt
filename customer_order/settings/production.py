@@ -16,7 +16,7 @@ DATABASES = {
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-DEBUG = False
+DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["my-python-app-1018047469031.europe-southwest1.run.app"]

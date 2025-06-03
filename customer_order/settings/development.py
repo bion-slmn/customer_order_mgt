@@ -17,5 +17,5 @@ SECRET_KEY = 'django-insecure-=%1@5%v7v^zgbafou-i6o180+8%s=e7rj($5tw93ma(m(=t6@m
 DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['my-python-app-1018047469031.europe-southwest1.run.app']
 
