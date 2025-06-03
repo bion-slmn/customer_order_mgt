@@ -76,14 +76,15 @@ jobs:
       run: | 
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app \
-        --image "europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest" \
-        --region europe-southwest1 \
-        --platform managed \
-        --memory 512Mi \
-        --cpu 1 \
-        --max-instances 1 \
-        --add-volume name=env-volume,secret=envronments \
-        --mount-volume mount-path=/secrets/env,volume=env-volume
+          --image "europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest" \
+          --region europe-southwest1 \
+          --platform managed \
+          --memory 512Mi \
+          --cpu 1 \
+          --max-instances 1 \
+          --add-volume name=env-volume,type=secret,secret=envronments \
+          --mount-volume mount-path=/secrets/env,volume=env-volume
+
 
 
         
