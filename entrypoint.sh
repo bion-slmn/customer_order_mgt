@@ -6,4 +6,4 @@ python manage.py makemigrations
 python manage.py migrate --noinput
 
 # Start the Gunicorn server
-exec gunicorn --bind 0.0.0.0:$PORT customer_order.wsgi:application
+exec gunicorn --bind 0.0.0.0:8080 customer_order.wsgi:application
