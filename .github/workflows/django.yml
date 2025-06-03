@@ -12,6 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
+      
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_ENV: production
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      GOOGLE_OAUTH_CALLBACK_URL: ${{ secrets.GOOGLE_OAUTH_CALLBACK_URL }}
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+      EMAIL_USE_TLS: true
+      ADMIN_USER_EMAIL: bionsol25@gmail.com
     services:
       postgres:
         image: postgres:latest
@@ -71,24 +83,29 @@ jobs:
         docker build -t "$IMAGE_URI" .
         docker push "$IMAGE_URI"
     
-    - name: Write env file from secret
-      run: |
-        printf "%s" "${{ secrets.ENV_FILE }}" > .env.prod
-
-
-
+    
     - name: Deploy to Cloud Run
-     
-      run: | 
+      run: |
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app \
-          --image "$IMAGE_URI" \
-          --platform managed \
-          --region europe-southwest1 \
-          --memory 512Mi \
-          --cpu 1 \
-          --max-instances 1 \
-          --env-vars-file .env.prod \
-          --allow-unauthenticated
-
-        
+        --image "$IMAGE_URI" \
+        --platform managed \
+        --region europe-southwest1 \
+        --memory 512Mi \
+        --cpu 1 \
+        --max-instances 1 \
+        --allow-unauthenticated \
+         --set-env-vars DJANGO_ENV="production" \
+        --set-env-vars EMAIL_HOST="smtp.gmail.com" \
+        --set-env-vars EMAIL_PORT="587" \
+        --set-env-vars EMAIL_USE_TLS="true" \
+        --set-env-vars ADMIN_USER_EMAIL="bionsol25@gmail.com" \
+        --set-env-vars AFRICA_TALKING_API_KEY="$AFRICA_TALKING_API_KEY" \
+        --set-env-vars DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
+        --set-env-vars CLIENT_SECRET="$CLIENT_SECRET" \
+        --set-env-vars CLIENT_ID="$CLIENT_ID" \
+        --set-env-vars GOOGLE_OAUTH_CALLBACK_URL="$GOOGLE_OAUTH_CALLBACK_URL" \
+        --set-env-vars EMAIL_HOST_USER="$EMAIL_HOST_USER" \
+        --set-env-vars EMAIL_HOST_PASSWORD="$EMAIL_HOST_PASSWORD" 
+       
+                  
