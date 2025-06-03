@@ -71,17 +71,25 @@ jobs:
         docker build -t "$IMAGE_URI" .
         docker push "$IMAGE_URI"
     
-    - name: Write env file from secret
+    # In your GitHub Actions workflow file (.github/workflows/deploy.yml)
+    - name: Write env file from secrets
       run: |
         cat <<EOF > .env.yaml
-        ${{ secrets.ENV_FILE }}
+        AFRICA_TALKING_API_KEY: "${{ secrets.AFRICA_TALKING_API_KEY }}"
+        DJANGO_SECRET_KEY: "${{ secrets.DJANGO_SECRET_KEY }}"
+        DJANGO_ENV: "development"
+        CLIENT_SECRET: "${{ secrets.CLIENT_SECRET }}"
+        CLIENT_ID: "${{ secrets.CLIENT_ID }}"
+        GOOGLE_OAUTH_CALLBACK_URL: "http://localhost:8000/api/v1/auth/google/callback/" # You might want to make this a secret too if it changes per environment
+        EMAIL_HOST: "smtp.gmail.com" # Consider if this should be a secret
+        EMAIL_PORT: 587 # Consider if this should be a secret
+        EMAIL_HOST_USER: "${{ secrets.EMAIL_HOST_USER }}"
+        EMAIL_HOST_PASSWORD: "${{ secrets.EMAIL_HOST_PASSWORD }}"
+        EMAIL_USE_TLS: True # Consider if this should be a secret
+        ADMIN_USER_EMAIL: "bionsol25@gmail.com" # Consider if this should be a secret
         EOF
-
-
-
     - name: Deploy to Cloud Run
-     
-      run: | 
+      run: |
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app \
           --image "$IMAGE_URI" \
