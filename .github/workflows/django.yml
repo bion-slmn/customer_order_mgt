@@ -73,7 +73,8 @@ jobs:
     
     - name: Write env file from secret
       run: |
-        echo "${{ secrets.ENV_FILE }}" > .env.prod
+        printf "%s" "${{ secrets.ENV_FILE }}" > .env.prod
+
 
 
     - name: Deploy to Cloud Run
