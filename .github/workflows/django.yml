@@ -95,16 +95,6 @@ jobs:
         --cpu 1 \
         --max-instances 1 \
         --allow-unauthenticated \
-        --set-env-vars AFRICA_TALKING_API_KEY=AFRICA_TALKING_API_KEY \
-        --set-env-vars DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
-        --set-env-vars DJANGO_ENV="production" \
-        --set-env-vars CLIENT_SECRET="$CLIENT_SECRET" \
-        --set-env-vars CLIENT_ID="$CLIENT_ID" \
-        --set-env-vars GOOGLE_OAUTH_CALLBACK_URL="$GOOGLE_OAUTH_CALLBACK_URL" \
-        --set-env-vars EMAIL_HOST="smtp.gmail.com" \
-        --set-env-vars EMAIL_PORT="587" \
-        --set-env-vars EMAIL_HOST_USER="$EMAIL_HOST_USER" \
-        --set-env-vars EMAIL_HOST_PASSWORD="$EMAIL_HOST_PASSWORD" \
-        --set-env-vars EMAIL_USE_TLS="true" \
-        --set-env-vars ADMIN_USER_EMAIL="bionsol25@gmail.com"
+        --set-env-vars AFRICA_TALKING_API_KEY=AFRICA_TALKING_API_KEY 
+       
                   
