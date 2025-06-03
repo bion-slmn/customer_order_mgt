@@ -24,7 +24,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.10', 3.12]
+        python-version: [3.12]
 
     steps:
     - uses: actions/checkout@v4
@@ -72,7 +72,7 @@ jobs:
         docker push "$IMAGE_URI"
 
     - name: Deploy to Cloud Run
-      run: |
+      run: | 
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app  \
           --image "$IMAGE_URI" \
