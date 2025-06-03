@@ -70,21 +70,24 @@ jobs:
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         docker build -t "$IMAGE_URI" .
         docker push "$IMAGE_URI"
+    
+    - name: Write env file from secret
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env.prod
+
 
     - name: Deploy to Cloud Run
      
       run: | 
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app \
-          --image "europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest" \
-          --region europe-southwest1 \
+          --image "$IMAGE_URI" \
           --platform managed \
+          --region europe-southwest1 \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 1 \
-          --add-volume name=env-volume,type=secret,secret=envronments \
-          --mount-volume mount-path=/secrets/env,volume=env-volume
-
-
+          --env-vars-file .env.prod \
+          --allow-unauthenticated
 
         
