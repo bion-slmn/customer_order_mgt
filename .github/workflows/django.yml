@@ -88,11 +88,14 @@ jobs:
       run: |
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app \
-            --image "$IMAGE_URI" \
-            --platform managed \
-            --region europe-southwest1 \
-            --memory 512Mi \
-            --cpu 1 \
-            --max-instances 1 \
-            --allow-unauthenticated \
-            --set-env-vars AFRICA_TALKING_API_KEY=$AFRICA_TALKING_API_KEY, DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
+        --image "$IMAGE_URI" \
+        --platform managed \
+        --region europe-southwest1 \
+        --memory 512Mi \
+        --cpu 1 \
+        --max-instances 1 \
+        --allow-unauthenticated \
+        --set-env-vars DJANGO_ENV=production,EMAIL_HOST=smtp.gmail.com,EMAIL_PORT=587,EMAIL_USE_TLS=true,ADMIN_USER_EMAIL=bionsol25@gmail.com \
+        --set-secrets AFRICA_TALKING_API_KEY=AFRICA_TALKING_API_KEY:latest,DJANGO_SECRET_KEY=DJANGO_SECRET_KEY:latest,CLIENT_SECRET=CLIENT_SECRET:latest,CLIENT_ID=CLIENT_ID:latest,GOOGLE_OAUTH_CALLBACK_URL=GOOGLE_OAUTH_CALLBACK_URL:latest,EMAIL_HOST_USER=EMAIL_HOST_USER:latest,EMAIL_HOST_PASSWORD=EMAIL_HOST_PASSWORD:latest
+            
+            
