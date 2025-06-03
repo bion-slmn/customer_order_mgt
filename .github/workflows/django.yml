@@ -73,7 +73,9 @@ jobs:
     
     - name: Write env file from secret
       run: |
-        printf "%s" "${{ secrets.ENV_FILE }}" > .env.prod
+        cat <<EOF > .env.prod
+        ${{ secrets.ENV_FILE }}
+        EOF
 
 
 
