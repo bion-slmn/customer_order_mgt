@@ -15,6 +15,5 @@ ENV PORT=8080
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "customer_order.wsgi:application"]
 
 
