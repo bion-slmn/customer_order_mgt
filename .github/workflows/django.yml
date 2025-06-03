@@ -95,4 +95,4 @@ jobs:
             --cpu 1 \
             --max-instances 1 \
             --allow-unauthenticated \
-            --set-env-vars AFRICA_TALKING_API_KEY=$AFRICA_TALKING_API_KEY
+            --set-env-vars AFRICA_TALKING_API_KEY=$AFRICA_TALKING_API_KEY, DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
