@@ -49,3 +49,37 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
     
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_DEPLOY_SA }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Configure Docker to use gcloud as a credential helper
+      run: |
+        gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
+    
+    
+    - name: Build and Push Docker image
+      run: |
+        IMAGE_URI="${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-python-repo/django-app:latest"
+        docker build -t "$IMAGE_URI" .
+        docker push "$IMAGE_URI"
+
+    - name: Deploy to Cloud Run
+      run: |
+        IMAGE_URI="${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-python-repo/django-app:latest"
+        gcloud run deploy my-python-app  \
+          --image "$IMAGE_URI" \
+          --platform managed \
+          --region ${{ secrets.GCP_LOCATION }} \
+          --memory 512Mi \
+          --cpu 1 \
+          --max-instances 1 \
+          --set-env-vars ENV=production
+        
