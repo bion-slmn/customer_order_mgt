@@ -72,14 +72,17 @@ jobs:
         docker push "$IMAGE_URI"
 
     - name: Deploy to Cloud Run
+     
       run: | 
         IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
         gcloud run deploy my-python-app  \
           --image "$IMAGE_URI" \
           --platform managed \
-          --region savanah-461107 \
+          --region europe-southwest1 \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 1 \
-          --set-env-vars ENV=production
+          --set-env-vars ENV=production \
+          --allow-unauthenticated
+
         
