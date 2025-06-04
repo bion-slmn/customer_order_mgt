@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-web
+  template:
+    metadata:
+      labels:
+        app: django-web
+    spec:
+      containers:
+        - name: django-web
+          image: europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_NAME
+              value: your_db_name
+            - name: DATABASE_USER
+              value: your_db_user
+            - name: DATABASE_PASSWORD
+              value: your_db_password
+            - name: DATABASE_HOST
+              value: postgres
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DJANGO_ALLOWED_HOSTS
+              value: yourdomain.com
+            # add all other env vars here or use a ConfigMap / Secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-web
+spec:
+  type: LoadBalancer
+  selector:
+    app: django-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000

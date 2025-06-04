@@ -28,8 +28,8 @@ jobs:
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: "5432"
       DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
 
       DEBUG: ${{ secrets.DEBUG }}
@@ -37,56 +37,42 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_DEPLOY_SA }}
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+
       - name: Configure Docker to use gcloud as a credential helper
         run: |
-          gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
+          gcloud auth configure-docker europe-southwest1-docker.pkg.dev
 
-      - name: Install Docker Compose
-        run: sudo apt-get install -y docker-compose
-      
-      
-      - name: Build and Push Docker image  
+      - name: Build Docker image
         run: |
           IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
-          docker compose up -d --build "$IMAGE_URI" .
-          docker compose run django-web python manage.py migrate
-          docker push "$IMAGE_URI"
-      - name: Deploy to Cloud Run
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Get GKE credentials
         run: |
-          IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
-          gcloud run deploy my-python-app \
-            --image "$IMAGE_URI" \
-            --platform managed \
-            --region europe-southwest1 \
-            --memory 512Mi \
-            --cpu 1 \
-            --max-instances 1 \
-            --allow-unauthenticated \
-            --set-env-vars DJANGO_ENV="production" \
-            --set-env-vars EMAIL_HOST="smtp.gmail.com" \
-            --set-env-vars EMAIL_PORT="587" \
-            --set-env-vars EMAIL_USE_TLS="true" \
-            --set-env-vars ADMIN_USER_EMAIL="bionsol25@gmail.com" \
-            --set-env-vars AFRICA_TALKING_API_KEY="$AFRICA_TALKING_API_KEY" \
-            --set-env-vars DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
-            --set-env-vars CLIENT_SECRET="$CLIENT_SECRET" \
-            --set-env-vars CLIENT_ID="$CLIENT_ID" \
-            --set-env-vars GOOGLE_OAUTH_CALLBACK_URL="$GOOGLE_OAUTH_CALLBACK_URL" \
-            --set-env-vars EMAIL_HOST_USER="$EMAIL_HOST_USER" \
-            --set-env-vars EMAIL_HOST_PASSWORD="$EMAIL_HOST_PASSWORD" \
-            --set-env-vars DATABASE_ENGINE="$DATABASE_ENGINE" \
-            --set-env-vars DATABASE_NAME="$DATABASE_NAME" \
-            --set-env-vars DATABASE_USERNAME="$DATABASE_USERNAME" \
-            --set-env-vars DATABASE_PASSWORD="$DATABASE_PASSWORD" \
-            --set-env-vars DATABASE_HOST="$DATABASE_HOST" \
-            --set-env-vars DATABASE_PORT="$DATABASE_PORT" \
-            --set-env-vars DEBUG="$DEBUG" \
-            --set-env-vars DJANGO_LOGLEVEL="$DJANGO_LOGLEVEL"
+          gcloud container clusters get-credentials django-cluster --region europe-southwest1
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f k8s/postgres-deployment.yaml
+          kubectl apply -f k8s/postgres-service.yaml
+          kubectl apply -f k8s/django-deployment.yaml
+
+      - name: Run Django migrations on GKE
+        run: |
+          kubectl run django-migrate --rm -it --image=europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest --restart=Never -- python manage.py migrate
