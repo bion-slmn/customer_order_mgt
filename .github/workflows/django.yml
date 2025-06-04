@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
     services:
       postgres:
         image: postgres:latest
