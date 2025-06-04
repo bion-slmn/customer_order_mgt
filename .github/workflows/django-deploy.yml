@@ -42,6 +42,8 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_DEPLOY_SA }}
+      - name: Install GKE auth plugin
+        run: gcloud components install gke-gcloud-auth-plugin
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
