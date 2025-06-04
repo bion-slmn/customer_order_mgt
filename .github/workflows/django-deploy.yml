@@ -30,6 +30,7 @@ jobs:
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
       DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+      DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
 
       DEBUG: ${{ secrets.DEBUG }}
       DJANGO_LOGLEVEL: ${{ secrets.DJANGO_LOGLEVEL }}
