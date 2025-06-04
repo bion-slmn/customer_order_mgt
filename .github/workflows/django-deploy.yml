@@ -1,0 +1,91 @@
+name: Django Deploy
+
+on:
+  workflow_run:
+    workflows: ["Django CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      AFRICA_TALKING_API_KEY: ${{ secrets.AFRICA_TALKING_API_KEY }}
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_ENV: production
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      GOOGLE_OAUTH_CALLBACK_URL: ${{ secrets.GOOGLE_OAUTH_CALLBACK_URL }}
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+      EMAIL_USE_TLS: true
+      ADMIN_USER_EMAIL: bionsol25@gmail.com
+
+      DATABASE_ENGINE: postgresql_psycopg2
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+
+      DEBUG: ${{ secrets.DEBUG }}
+      DJANGO_LOGLEVEL: ${{ secrets.DJANGO_LOGLEVEL }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_DEPLOY_SA }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Configure Docker to use gcloud as a credential helper
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev
+
+      - name: Install Docker Compose
+        run: sudo apt-get install -y docker-compose
+      
+      
+      - name: Build and Push Docker image  
+        run: |
+          IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
+          docker compose up -d --build "$IMAGE_URI" .
+          docker compose run django-web python manage.py migrate
+          docker push "$IMAGE_URI"
+      - name: Deploy to Cloud Run
+        run: |
+          IMAGE_URI="europe-southwest1-docker.pkg.dev/savanah-461107/my-python-repo/django-app:latest"
+          gcloud run deploy my-python-app \
+            --image "$IMAGE_URI" \
+            --platform managed \
+            --region europe-southwest1 \
+            --memory 512Mi \
+            --cpu 1 \
+            --max-instances 1 \
+            --allow-unauthenticated \
+            --set-env-vars DJANGO_ENV="production" \
+            --set-env-vars EMAIL_HOST="smtp.gmail.com" \
+            --set-env-vars EMAIL_PORT="587" \
+            --set-env-vars EMAIL_USE_TLS="true" \
+            --set-env-vars ADMIN_USER_EMAIL="bionsol25@gmail.com" \
+            --set-env-vars AFRICA_TALKING_API_KEY="$AFRICA_TALKING_API_KEY" \
+            --set-env-vars DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
+            --set-env-vars CLIENT_SECRET="$CLIENT_SECRET" \
+            --set-env-vars CLIENT_ID="$CLIENT_ID" \
+            --set-env-vars GOOGLE_OAUTH_CALLBACK_URL="$GOOGLE_OAUTH_CALLBACK_URL" \
+            --set-env-vars EMAIL_HOST_USER="$EMAIL_HOST_USER" \
+            --set-env-vars EMAIL_HOST_PASSWORD="$EMAIL_HOST_PASSWORD" \
+            --set-env-vars DATABASE_ENGINE="$DATABASE_ENGINE" \
+            --set-env-vars DATABASE_NAME="$DATABASE_NAME" \
+            --set-env-vars DATABASE_USERNAME="$DATABASE_USERNAME" \
+            --set-env-vars DATABASE_PASSWORD="$DATABASE_PASSWORD" \
+            --set-env-vars DATABASE_HOST="$DATABASE_HOST" \
+            --set-env-vars DATABASE_PORT="$DATABASE_PORT" \
+            --set-env-vars DEBUG="$DEBUG" \
+            --set-env-vars DJANGO_LOGLEVEL="$DJANGO_LOGLEVEL"
