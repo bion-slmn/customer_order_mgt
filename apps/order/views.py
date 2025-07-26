@@ -6,9 +6,11 @@ from .service import OrderService
 from rest_framework.permissions import IsAuthenticated
 import django_rq
 from notifications import send_order_email_to_admin, send_order_sms
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class OrderView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     """
     API view to handle order operations.

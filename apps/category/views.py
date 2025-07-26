@@ -4,6 +4,8 @@ from rest_framework import status
 from .service import CatergoryService
 from .serializer import CategorySerializer
 from ..product.serializer import ProductSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 
@@ -11,6 +13,8 @@ class CategoryView(APIView):
     """
     API view to handle category operations.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, category_id:str):
         """
@@ -33,6 +37,8 @@ class CategoryProductsView(APIView):
     """
     API view to handle product retrieval under a category.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, category_id:str):
         """
@@ -47,6 +53,8 @@ class CategoryAveragePriceView(APIView):
     """
     API view to handle average product price retrieval under a category.
     """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, category_id:str):
         """

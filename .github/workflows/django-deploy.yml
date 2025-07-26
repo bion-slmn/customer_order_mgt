@@ -74,6 +74,7 @@ jobs:
           kubectl apply -f k8s/postgres-deployment.yaml
           kubectl apply -f k8s/postgres-service.yaml
           kubectl apply -f k8s/django-deployment.yaml
+          
 
       - name: Run Django migrations on GKE
         run: |

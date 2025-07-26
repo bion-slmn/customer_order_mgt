@@ -1,3 +1,4 @@
+# postgres-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,14 +15,23 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:13
+          image: postgres:17-alpine3.21
           env:
             - name: POSTGRES_DB
-              value: your_db_name
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DATABASE_NAME
             - name: POSTGRES_USER
-              value: your_db_user
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DATABASE_USERNAME
             - name: POSTGRES_PASSWORD
-              value: your_db_password
+              valueFrom:
+                configMapKeyRef:
+                  name: django-config
+                  key: DATABASE_PASSWORD
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -29,16 +39,15 @@ spec:
               name: postgres-storage
       volumes:
         - name: postgres-storage
-          persistentVolumeClaim:
-            claimName: postgres-pvc
+          emptyDir: {}
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: Service
 metadata:
-  name: postgres-pvc
+  name: postgres
 spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432

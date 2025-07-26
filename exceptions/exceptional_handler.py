@@ -89,12 +89,15 @@ def _handle_validation_error(exc, context, response):
 
 def _handle_generic_error(exc, context, response):
     """
-    Handle generic errors.
+    Handle generic errors including authentication and permission errors.
     """
+    status_code = response.status_code if response else 401
+    message = response.data['detail'] if response and 'detail' in response.data else str(exc)
+
     return Response(
         {
-            'status': response.status_code,
-            'message': response.data['detail']
+            'status': status_code,
+            'message': message
         },
-        status=response.status_code
+        status=status_code
     )

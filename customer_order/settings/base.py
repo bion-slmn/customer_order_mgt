@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -117,10 +118,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
-    
+    # Keep only this for DRF API endpoints:
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
     
+    # Use this only for admin/login views if needed:
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ACCOUNT_LOGIN_METHODS = {'email'}  # Use Email / Password authentication
@@ -135,7 +137,11 @@ REST_FRAMEWORK = {
         #'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
+
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 # Connect local account and social account if local account with that email address already exists
@@ -179,7 +185,7 @@ LOGIN_REDIRECT_URL = '/'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': os.environ.get("REDIS_URL", 'redis://redis:6379/1'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'MAX_ENTRIES': 5000,

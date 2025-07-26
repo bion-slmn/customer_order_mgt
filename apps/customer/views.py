@@ -1,3 +1,4 @@
+from urllib import response
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -12,6 +13,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .service import CustomerService
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
 
 
 class CustomerView(APIView):
@@ -19,9 +24,12 @@ class CustomerView(APIView):
     API endpoint to create a new customer.
     Requires authentication via token or session
     """
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print("Authenticated user:", request.user)
+        print("Is authenticated:", request.user.is_authenticated)
         data = request.data
         customer = CustomerService.create_customer(data)
         return Response(customer, status=201)  
@@ -46,14 +54,33 @@ class GoogleLoginCallback(APIView):
     """
     def get(self, request, *args, **kwargs):
         code = request.GET.get("code")
+        print("Received code:", code)  # Debugging line
 
         if code is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-        token_endpoint_url = urljoin("https://my-python-app-1018047469031.europe-southwest1.run.app", reverse("google_login"))
-        response = requests.post(url=token_endpoint_url, data={"code": code})
 
-        return Response(response.json(), status=status.HTTP_200_OK)
+        response = CustomerService.exchange_code_for_token(code)
+        
+        access_token = response.json().get("access_token")
+        if not access_token:
+            return Response({"error": "Access token not found"}, status=status.HTTP_400_BAD_REQUEST)
+        user = CustomerService.create_or_update_customer_from_google(access_token)
+
+        print("User created or updated:", user)  # Debugging line
+
+        refresh = RefreshToken.for_user(user)
+        jwt_tokens = {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user_id": user.id,
+        }
+
+        print("User created or updated:", user)
+
+        return Response(jwt_tokens, status=status.HTTP_200_OK)
+    
+    
+
 
 
 class LoginPage(View):

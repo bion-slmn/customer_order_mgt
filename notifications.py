@@ -23,6 +23,7 @@ def send_order_sms(customer, order_id):
 
     if not phone_number:
         return
+    print(f"Sending SMS to {phone_number}")
 
     message = f"Hi {customer_name}, your order #{order_id} has been received. Thank you for shopping with us!"
     try:
