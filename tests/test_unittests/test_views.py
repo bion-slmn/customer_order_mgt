@@ -1,16 +1,29 @@
 from apps.customer.models import Customer
 from apps.order.models import Order
 
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.urls import reverse
 from apps.category.models import Category
 from apps.product.models import Product
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.contrib.auth import get_user_model
+from unittest.mock import patch
+
+
+
+User = get_user_model()
 
 
 class CategoryViewTests(APITestCase):
     def setUp(self):
+
+        self.user = get_user_model().objects.create_user(username='testuser', password='password123')
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
+
         self.parent_category = Category.objects.create(name="Electronics")
         self.sub_category = Category.objects.create(name="Phones", parent=self.parent_category)
 
@@ -57,6 +70,9 @@ class CategoryViewTests(APITestCase):
 
 class ProductViewTests(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='password123')
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
         self.category = Category.objects.create(name="Electronics")
         self.product = Product.objects.create(
             name="Test Product",
@@ -89,13 +105,7 @@ class ProductViewTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-from rest_framework.test import APITestCase, APIClient
-from django.contrib.auth import get_user_model
-from unittest.mock import patch
 
-
-
-User = get_user_model()
 
 class OrderViewTests(APITestCase):
     def setUp(self):
@@ -142,14 +152,14 @@ class OrderViewTests(APITestCase):
         order.product.set([self.product])
         url = reverse("view_order", args=[str(order.id)])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 
     def test_create_order_unauthenticated(self):
         self.client.logout()
         url = reverse("create_order")
         response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 
 class CustomerViewTests(APITestCase):
